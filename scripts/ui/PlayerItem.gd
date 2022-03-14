@@ -14,6 +14,7 @@ func set_player(_id, _player, is_ready):
 	$Name.text = _player.name
 	$Tank.select(_player.tank)
 	$Team.select(_player.team)
+	$Difficulty.select(_player.difficulty)
 	$Difficulty.visible = _player.is_bot
 	if _player.is_bot || is_ready:
 		$Name.add_color_override("font_color", ready_color)
@@ -45,4 +46,5 @@ func _on_Tank_item_selected(index):
 
 
 func _on_Difficulty_item_selected(index):
-	pass # Replace with function body.
+	print("Difficulty : id - " + str(player_id) + " - index: " + str(index))
+	GameState.rpc("change_difficulty", player_id, index)

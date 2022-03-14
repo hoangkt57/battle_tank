@@ -27,7 +27,9 @@ func control(delta):
 			rotation_degrees = 0
 			
 		if Input.is_action_just_pressed("ui_accept"):
-			rpc("shoot", get_tree().get_network_unique_id())
+			var dir = Vector2(0,1).rotated($Turret.global_rotation)
+			rpc("shoot", get_tree().get_network_unique_id(), dir)
+			
 		
 		position.x = clamp(position.x, Globals.CELL_SIZE/2, Globals.CELL_SIZE * Globals.CELL_COUNT - Globals.CELL_SIZE/2)
 		position.y = clamp(position.y, Globals.CELL_SIZE/2, Globals.CELL_SIZE * Globals.CELL_COUNT - Globals.CELL_SIZE/2)

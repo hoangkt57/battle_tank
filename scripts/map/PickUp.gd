@@ -12,18 +12,14 @@ var type
 func random_type():
 	return randi() % Globals.BUFF_SIZE
 
-func set_type():
+func set_type(_position):
 	type = random_type()
 	$Sprite.texture = textures[type]
 	var rect = RectangleShape2D.new()
 	rect.extents = $Sprite.get_rect().size / 2
 	$CollisionShape2D.shape = rect
 	
-	var random = RandomNumberGenerator.new()
-	random.randomize()
-	var x = random.randi_range(Globals.CELL_SIZE, Globals.CELL_SIZE * (Globals.CELL_COUNT - 1))
-	var y = random.randi_range(Globals.CELL_SIZE, Globals.CELL_SIZE * (Globals.CELL_COUNT - 1))
-	position = Vector2(x, y)
+	position = _position
 	$PickUpAppear.play()
 
 func _on_PickUp_body_entered(body):

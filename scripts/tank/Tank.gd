@@ -4,7 +4,7 @@ signal shoot
 signal dead
 
 var speed = 200
-var gun_cooldown = 0.4
+var gun_cooldown = 1
 var max_health = 100
 var bullet_speed = 750
 var bullet_damage = 40
@@ -28,6 +28,7 @@ var health
 var bar_texture
 var player_id
 var is_bot
+var difficulty
 
 func _ready():
 	health = max_health
@@ -47,12 +48,11 @@ func _physics_process(delta):
 #	if not is_network_master():
 #		puppet_position = position
 	
-remotesync func shoot(by_who):
+remotesync func shoot(by_who, _direction):
 	if not can_shoot:
 		return
 	can_shoot = false
 	$Timer.start()
-	var dir = Vector2(0,1).rotated($Turret.global_rotation)
 	$AnimationPlayer.play('fire')
 	if by_who == GameState.get_current_id():
 		$ShootAudio.play()
@@ -60,7 +60,7 @@ remotesync func shoot(by_who):
 	var b = bullet.instance()
 	b.set_config(by_who, bullet_speed, bullet_damage, bullet_life_time)
 	get_node("../..").add_child(b)
-	b.start($Turret/Muzzle.global_position, dir, $Body.frame)
+	b.start($Turret/Muzzle.global_position, _direction, $Body.frame)
 
 func explode(by_who):
 	alive = false
@@ -74,7 +74,7 @@ func explode(by_who):
 	
 func take_damage(by_who, damage):
 #	print("take_damage - ", by_who, " - ", player_id)
-	if by_who == player_id or enable_shield:
+	if by_who == player_id or enable_shield or !alive:
 		return
 	if by_who == GameState.get_current_id() or player_id == GameState.get_current_id():
 		$TakeDamageAudio.play()
@@ -103,10 +103,12 @@ func _on_Explosion_animation_finished():
 	
 func set_player(_id, new_player):
 	player_id = _id
+	difficulty = new_player.difficulty
 	is_bot = new_player.is_bot
 	$Label.text = new_player.name
 	$Body.frame = new_player.tank
 	$Turret.frame = new_player.tank
+	
 	
 func respawn_value():
 	pass
@@ -122,7 +124,7 @@ func respawn():
 	$Body.show()
 	$Turret.show()
 	enable_shield()
-	if GameState.is_host():
+	if is_network_master():
 		var map = get_node("../..")
 		var size = map.get_node("SpawnPoints").get_child_count()
 		var random = RandomNumberGenerator.new()
@@ -142,6 +144,9 @@ func _on_ShieldTimer_timeout():
 	$Shield.stop()
 	$Shield.hide()
 	enable_shield = false
+	
+func get_player_name():
+	return $Label.get_text()
 	
 func pick_up_buff(_type):
 	if _type == Globals.BUFF_ITEMS.damage:

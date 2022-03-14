@@ -181,6 +181,16 @@ remotesync func change_tank(_id, _tank):
 	Globals.change_player_tank(value, _tank)
 	add_player_to_list(_id, value)
 	
+remotesync func change_difficulty(_id, _difficulty):
+	if not is_host():
+		return
+	if not puppet_players.has(_id):
+		print("change_difficulty - " + str(_id) + " is not exists")
+		return
+	var value = puppet_players[_id]
+	Globals.change_bot_difficulty(value, _difficulty)
+	add_player_to_list(_id, value)
+	
 	
 	
 	

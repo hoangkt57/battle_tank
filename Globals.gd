@@ -26,3 +26,6 @@ func create_bot_id(index):
 
 func change_player_tank(_player, _tank):
 	_player["tank"] = _tank
+	
+func change_bot_difficulty(_player, _difficulty):
+	_player["difficulty"] = _difficulty
